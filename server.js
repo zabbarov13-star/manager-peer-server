@@ -3,6 +3,8 @@ const express = require('express');
 const http = require('http');
 const { ExpressPeerServer } = require('peer');
 
+function createPeerServer() {
+  // Keep the executable entry point and isolated contract tests on the same server.
 const app = express();
 const server = http.createServer(app);
 app.disable('x-powered-by');
@@ -17,7 +19,15 @@ const peerServer = ExpressPeerServer(server, {
 });
 app.use('/peerjs', peerServer);
 
+  return server;
+}
+
+if (require.main === module) {
 const port = Number(process.env.PORT) || 10000;
+const server = createPeerServer();
 server.listen(port, '0.0.0.0', () => {
   console.log(`Manager PeerServer listening on ${port}`);
 });
+
+}
+module.exports = { createPeerServer };
